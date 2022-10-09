@@ -1,24 +1,14 @@
-const contacts = require("../../models/contacts");
+const { Contact } = require('../../models/contact');
 
-const { RequestError } = require("../../helpers");
+const { RequestError } = require('../../helpers');
 
-const { addSchema } = require("../../schemas/contact");
-
-const updateById = async (req, res, next) => {
-  try {
-    const { error } = addSchema.validate(req.body);
-    if (error) {
-      throw RequestError(400, "missing fields");
-    }
-    const { contactId } = req.params;
-    const results = await contacts.updateContact(contactId, req.body);
-    if (!results) {
-      throw RequestError(404, "Not found");
-    }
-    res.status(201).json(results);
-  } catch (error) {
-    next(error);
+const updateById = async (req, res) => {
+  const { contactId } = req.params;
+  const results = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
+  if (!results) {
+    throw RequestError(404, 'Not found');
   }
-}
+  res.status(201).json(results);
+};
 
 module.exports = updateById;
